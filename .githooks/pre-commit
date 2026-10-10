@@ -1,0 +1,2 @@
+#!/bin/sh
+node tests/test-logic.mjs >/dev/null && node tests/test-privacy.mjs

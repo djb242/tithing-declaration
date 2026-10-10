@@ -1,0 +1,13 @@
+{
+  "name": "tithing-declaration",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "A private helper for scheduling tithing declaration. Static site; no server, no AI.",
+  "license": "MIT",
+  "scripts": {
+    "test": "node tests/test-logic.mjs && node tests/test-privacy.mjs",
+    "serve": "python3 -m http.server 8080",
+    "prepare": "git config core.hooksPath .githooks || true"
+  }
+}

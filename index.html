@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
+<meta name="description" content="Keep track of tithing declaration appointments: who to remind, who to reach out to next. Your data stays on your device and in your own cloud storage.">
+<meta name="theme-color" content="#3d5a6c">
+<title>Tithing Declaration</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="stylesheet" href="styles.css">
+<script type="module" src="src/app.js"></script>
+</head>
+<body>
+<header class="top">
+  <a class="brand" href="#today">Tithing Declaration</a>
+  <nav><a href="#today">Today</a><a href="#families">Families</a><a href="#settings">Settings</a></nav>
+</header>
+<div id="syncbar" class="syncbar" hidden></div>
+<main id="main"><section class="card"><p class="meta">Loading…</p></section></main>
+<div id="toast" class="toast" role="status" hidden></div>
+<noscript><p class="card">This app needs JavaScript turned on.</p></noscript>
+</body>
+</html>
