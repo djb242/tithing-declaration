@@ -97,7 +97,7 @@ const ICON = {
 const icon = (ch) => `<svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true">${ICON[ch] || ''}</svg>`;
 
 // A steady color per family, from its name, for the initials circle.
-const HUES = [248, 330, 190, 160, 280, 12, 210, 300];
+const HUES = [218, 200, 30, 150, 350, 260, 45, 180];
 function avatar(name) {
   const clean = String(name || '?').replace(/,.*$/, '').trim();
   let h = 0;

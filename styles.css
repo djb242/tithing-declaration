@@ -1,13 +1,13 @@
 /* A phone-native utility: cool grouped lists, bold sans titles, one evergreen
    brand color. System fonts only: the app loads nothing from other sites. */
 :root {
-  --bg: #f4f3ff; --surface: #ffffff; --ink: #14123a; --muted: #6b6a8c; --faint: #a3a2c2;
-  --line: #e8e6fb; --line-strong: #d4d1f5;
-  --brand: #3b2bff; --brand-strong: #2a1ce0; --brand-ink: #ffffff; --brand-soft: #ebe9ff;
-  --lemon: #e9ff5c; --lemon-ink: #14123a;
-  --hero: #3b2bff; --hero-ink: #ffffff;
-  --blue-bg: #e3e9ff; --blue: #2a46d6; --green-bg: #dcf8e8; --green: #0d7a46;
-  --amber-bg: #fff0c9; --amber: #8a5a00; --red-bg: #ffe1e6; --red: #c0123c;
+  --bg: #f5f4f0; --surface: #ffffff; --ink: #1c2333; --muted: #667085; --faint: #a3a9b6;
+  --line: #e7e5df; --line-strong: #d6d3cb;
+  --brand: #1f2d4d; --brand-strong: #162139; --brand-ink: #ffffff; --brand-soft: #e8ebf2;
+  --lemon: #d8b866; --lemon-ink: #2a2110;
+  --hero: #1f2d4d; --hero-ink: #ffffff;
+  --blue-bg: #e6ebf4; --blue: #2f4a7a; --green-bg: #e3efe6; --green: #2e6b45;
+  --amber-bg: #f6edd6; --amber: #7d5a12; --red-bg: #f6e3e1; --red: #9b2c24;
   --sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI Variable Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   --display: "SF Pro Rounded", ui-rounded, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   --mono: ui-monospace, "SF Mono", "Cascadia Mono", Menlo, monospace;
@@ -16,13 +16,13 @@
 }
 @media (prefers-color-scheme: dark) {
   :root {
-    --bg: #0c0b1f; --surface: #17153a; --ink: #f1f0ff; --muted: #a3a1cc; --faint: #6d6b99;
-    --line: #25225a; --line-strong: #35317a;
-    --brand: #7d70ff; --brand-strong: #978cff; --brand-ink: #0c0b1f; --brand-soft: #262268;
-    --lemon: #e9ff5c; --lemon-ink: #14123a;
-    --hero: #3b2bff; --hero-ink: #ffffff;
-    --blue-bg: #1f2a66; --blue: #a9b9ff; --green-bg: #12382a; --green: #6fe3a8;
-    --amber-bg: #3a2c0c; --amber: #ffd36b; --red-bg: #42142a; --red: #ff8fa6;
+    --bg: #11151d; --surface: #1a202b; --ink: #eef0f4; --muted: #a2a9b7; --faint: #6c7383;
+    --line: #262d3a; --line-strong: #343c4b;
+    --brand: #c9d3e8; --brand-strong: #dfe5f2; --brand-ink: #141a26; --brand-soft: #253049;
+    --lemon: #d8b866; --lemon-ink: #2a2110;
+    --hero: #2a3b62; --hero-ink: #ffffff;
+    --blue-bg: #1f2a40; --blue: #a9bde3; --green-bg: #1b2e24; --green: #94c9a6;
+    --amber-bg: #33290f; --amber: #e2c27a; --red-bg: #3a1e1c; --red: #eba39b;
     color-scheme: dark;
   }
 }
@@ -48,9 +48,9 @@ body.in-setup nav { visibility: hidden; }
 main { max-width: 720px; margin: 0 auto; padding: 20px 16px 112px; }
 
 /* hero: the signature color, full width */
-.hero { background: var(--hero); color: var(--hero-ink); border-radius: 32px; padding: 24px 24px 20px; margin: 0 0 30px; position: relative; overflow: hidden; isolation: isolate; }
-.hero::before { content: ""; position: absolute; z-index: -1; right: -40px; top: -50px; width: 190px; height: 190px; border-radius: 50%; background: var(--lemon); }
-.hero::after { content: ""; position: absolute; z-index: -1; right: 110px; bottom: -36px; width: 90px; height: 90px; border-radius: 26px; background: rgb(255 255 255 / .12); transform: rotate(18deg); }
+.hero { box-shadow: inset 0 0 0 1px rgb(255 255 255 / .06); background: var(--hero); color: var(--hero-ink); border-radius: 32px; padding: 24px 24px 20px; margin: 0 0 30px; position: relative; overflow: hidden; isolation: isolate; }
+.hero::before { content: ""; position: absolute; z-index: -1; right: -60px; top: -70px; width: 200px; height: 200px; border-radius: 50%; border: 22px solid rgb(216 184 102 / .35); }
+.hero::after { content: ""; position: absolute; z-index: -1; right: 110px; bottom: -36px; width: 90px; height: 90px; border-radius: 26px; background: rgb(255 255 255 / .05); transform: rotate(18deg); }
 .eyebrow { margin: 0; font: 700 .8rem/1.2 var(--display); letter-spacing: .04em; text-transform: uppercase; opacity: .85; }
 .big { margin: 4px 0 0; font: 800 clamp(4.2rem, 19vw, 6.5rem)/0.95 var(--display); letter-spacing: -0.05em; font-variant-numeric: tabular-nums; }
 .big .of { opacity: .55; font-size: .5em; letter-spacing: -0.02em; }
@@ -70,7 +70,7 @@ main { max-width: 720px; margin: 0 auto; padding: 20px 16px 112px; }
 @keyframes rise { from { opacity: 0; transform: translateY(8px); } }
 @media (prefers-reduced-motion: reduce) { .group { animation: none; } .bar span { transition: none; } }
 .group > h2 { display: flex; align-items: center; gap: 8px; margin: 0 4px 8px; font: 800 1.45rem/1.15 var(--display); letter-spacing: -0.025em; }
-.card { background: var(--surface); border-radius: var(--radius); padding: 6px 18px; margin-bottom: 16px; box-shadow: 0 1px 0 var(--line), 0 10px 30px -18px rgb(59 43 255 / .35); }
+.card { background: var(--surface); border-radius: var(--radius); padding: 6px 18px; margin-bottom: 16px; box-shadow: 0 1px 0 var(--line), 0 10px 30px -20px rgb(20 30 50 / .25); }
 .group > .card { margin-bottom: 0; }
 .card > .hint:first-child { margin: 12px 0 2px; }
 section.card { padding: 18px; } /* stand-alone cards: families, settings, wizard */
@@ -90,8 +90,8 @@ ul { margin: 0; padding: 0; list-style: none; }
 .row { display: flex; flex-wrap: wrap; gap: 10px 12px; align-items: center; padding: 12px 0; border-top: 1px solid var(--line); }
 .card ul > .row:first-child { border-top: 0; }
 .avatar { flex: none; display: grid; place-items: center; width: 44px; height: 44px; border-radius: 15px;
-  background: hsl(var(--h) 90% 90%); color: hsl(var(--h) 70% 30%); font: 800 1rem/1 var(--display); letter-spacing: .02em; }
-@media (prefers-color-scheme: dark) { .avatar { background: hsl(var(--h) 65% 36%); color: hsl(var(--h) 100% 93%); } }
+  background: hsl(var(--h) 35% 91%); color: hsl(var(--h) 40% 30%); font: 800 1rem/1 var(--display); letter-spacing: .02em; }
+@media (prefers-color-scheme: dark) { .avatar { background: hsl(var(--h) 25% 28%); color: hsl(var(--h) 45% 88%); } }
 .who { display: flex; flex-direction: column; min-width: 0; flex: 1 1 160px; }
 .who a, .who b { font-weight: 650; text-decoration: none; color: var(--ink); }
 .who .meta { font-size: .85rem; }
@@ -137,7 +137,7 @@ code { font: .85em var(--mono); background: var(--bg); padding: 1px 5px; border-
 
 /* slots */
 .slots { display: flex; flex-wrap: wrap; gap: 8px; margin: 14px 0 10px; }
-.chip { padding: 8px 13px; border-radius: 999px; background: var(--lemon); color: var(--lemon-ink); font-weight: 650; font-size: .875rem; font-variant-numeric: tabular-nums; }
+.chip { padding: 8px 13px; border-radius: 999px; background: var(--brand-soft); color: var(--brand); font-weight: 650; font-size: .875rem; font-variant-numeric: tabular-nums; }
 .slots + .link { display: inline-block; margin-bottom: 14px; }
 
 /* sync bar, toast */
@@ -166,5 +166,5 @@ details summary { cursor: pointer; font-weight: 650; }
   .row:has(.avatar) .acts { margin-left: 56px; width: calc(100% - 56px); }
   .row:has(.avatar) .who { flex-basis: calc(100% - 56px); }
   .hero { border-radius: 28px; padding: 20px 20px 18px; }
-  .hero::before { width: 120px; height: 120px; right: -34px; top: -40px; }
+  .hero::before { width: 130px; height: 130px; right: -46px; top: -52px; border-width: 16px; }
 }
