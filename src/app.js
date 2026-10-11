@@ -97,7 +97,7 @@ const ICON = {
 const icon = (ch) => `<svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true">${ICON[ch] || ''}</svg>`;
 
 // A steady color per family, from its name, for the initials circle.
-const HUES = [152, 200, 230, 265, 330, 20, 40, 95];
+const HUES = [248, 330, 190, 160, 280, 12, 210, 300];
 function avatar(name) {
   const clean = String(name || '?').replace(/,.*$/, '').trim();
   let h = 0;
@@ -136,7 +136,7 @@ function wireLogging(root) {
   }
 }
 
-const card = (title, body, extra = '') => `<section class="group"><h2>${title}</h2><div class="card">${extra}${body}</div></section>`;
+const card = (title, body, extra = '', id = '') => `<section class="group"${id ? ` id="sec-${id}"` : ''}><h2>${title}</h2><div class="card">${extra}${body}</div></section>`;
 const count = (n, tone = '') => `<span class="count ${tone}">${n}</span>`;
 
 function renderToday() {
@@ -148,7 +148,7 @@ function renderToday() {
   const pct = counted ? Math.round((done / counted) * 100) : 0;
 
   if (!c.total) {
-    main().innerHTML = `<section class="card empty"><h2>No families yet</h2><p>Add your ward's families to get started.</p>
+    main().innerHTML = `<section class="card empty">${CAUGHT_UP.replace('M58 57l15 15 30-34', 'M80 35v40M60 55h40')}<h2>No families yet</h2><p>Add your ward's families to get started.</p>
       <p><a class="btn primary" href="#families">Add families</a> <a class="btn" href="#setup">Run setup</a></p></section>`;
     return;
   }
@@ -163,37 +163,40 @@ function renderToday() {
     : '';
 
   const remind = p.remind.length ? card(`Remind ${count(p.remind.length, 'blue')}`, `<ul>${p.remind.map((f) =>
-    fam(f, `${f.apptIsToday ? 'Today' : 'Tomorrow'}${f.apptTime ? `, ${esc(f.apptTime)}` : ''}`, stepButtons(f, 'reminder', 'text'))).join('')}</ul>`) : '';
+    fam(f, `${f.apptIsToday ? 'Today' : 'Tomorrow'}${f.apptTime ? `, ${esc(f.apptTime)}` : ''}`, stepButtons(f, 'reminder', 'text'))).join('')}</ul>`, '', 'remind') : '';
 
   const close = p.followUp.length ? card(`Close out ${count(p.followUp.length, 'yellow')}`, `<p class="hint">These appointments have passed. Did they come?</p><ul>${p.followUp.map((f) =>
     fam(f, `Was ${esc(f.apptPretty)}`, `<button class="btn primary" data-status="declared" data-id="${esc(f.id)}">Declared</button>
-      <button class="btn" data-status="open" data-id="${esc(f.id)}">Didn't come</button>`)).join('')}</ul>`) : '';
+      <button class="btn" data-status="open" data-id="${esc(f.id)}">Didn't come</button>`)).join('')}</ul>`, '', 'close') : '';
 
   const reach = p.reach.length ? card(`Reach out ${count(p.reach.length, '')}`, `<ul>${p.reach.map((f) =>
-    fam(f, `${esc(f.lastLine)} · next: ${CHANNEL_LABEL[f.next.channel].toLowerCase()}${f.next.again ? ' again' : ''}`, stepButtons(f, 'invite', f.next.channel))).join('')}</ul>`) : '';
+    fam(f, `${esc(f.lastLine)} · next: ${CHANNEL_LABEL[f.next.channel].toLowerCase()}${f.next.again ? ' again' : ''}`, stepButtons(f, 'invite', f.next.channel))).join('')}</ul>`, '', 'reach') : '';
 
   const unmatched = p.unmatched.length ? card(`Bookings to check ${count(p.unmatched.length, 'red')}`,
     `<p class="hint">These bookings didn't match exactly one family, so nobody will be reminded about them.</p><ul>${p.unmatched.map((e) => `
     <li class="row"><div class="who"><b>${esc(e.summary)}</b><span class="meta">${esc(prettyAppt(e.start))}${e.reason ? ` — ${esc(e.reason)}` : ''}${e.booker ? ` — booked by ${esc(e.booker.name)}` : ''}</span></div>
     <div class="acts"><select data-link-event="${esc(e.id)}"><option value="">Link to family…</option>${p.all.filter((f) => f.status !== 'skip').sort((a, b) => a.name.localeCompare(b.name)).map((f) => `<option value="${esc(f.id)}">${esc(f.name)}</option>`).join('')}</select>
-    <button class="btn" data-ignore="${esc(e.id)}">Not an appointment</button></div></li>`).join('')}</ul>`) : '';
+    <button class="btn" data-ignore="${esc(e.id)}">Not an appointment</button></div></li>`).join('')}</ul>`, '', 'check') : '';
 
   const nothing = !p.remind.length && !p.followUp.length && !p.reach.length && !p.unmatched.length
-    ? card('All caught up', `<p>Nobody to remind or reach out to today.${p.waiting.length ? ` Next follow-up: ${esc(p.waiting[0].name)}, ${esc(p.waiting[0].dueOn)}.` : ''}</p>`) : '';
+    ? card('All caught up', `${CAUGHT_UP}<p class="center">Nobody to remind or reach out to today.${p.waiting.length ? ` Next follow-up: ${esc(p.waiting[0].name)}, ${esc(p.waiting[0].dueOn)}.` : ''}</p>`) : '';
 
   const upcoming = p.upcoming.length ? card(`Coming up ${count(p.upcoming.length, 'green')}`, `<ul class="plain">${p.upcoming.slice(0, 12).map((f) =>
     `<li class="line"><a href="#family/${esc(f.id)}">${esc(f.name)}</a><span class="meta">${esc(f.apptPretty)}${f.reminded ? ' · reminded' : ''}</span></li>`).join('')}</ul>`) : '';
 
   main().innerHTML = `
-    <section class="progress">
+    <section class="hero">
       ${doc.settings.wardName ? `<p class="eyebrow">${esc(doc.settings.wardName)}</p>` : ''}
-      <h1><span class="num">${done}</span> of ${counted} <span class="soft">families scheduled or declared</span></h1>
+      <p class="big"><span class="num">${done}</span><span class="of">/${counted}</span></p>
+      <p class="sub">families scheduled or declared · <b>${pct}%</b></p>
       <div class="bar" role="progressbar" aria-valuenow="${pct}" aria-valuemin="0" aria-valuemax="100"><span style="width:${pct}%"></span></div>
-      <dl class="stats"><div><dt>Declared</dt><dd>${c.declared}</dd></div><div><dt>Scheduled</dt><dd>${c.scheduled}</dd></div><div><dt>To go</dt><dd>${c.open}</dd></div><div><dt>Done</dt><dd>${pct}%</dd></div></dl>
+      <div class="jump">${[['check', 'To check', p.unmatched.length], ['remind', 'Remind', p.remind.length], ['close', 'Close out', p.followUp.length], ['reach', 'Reach out', p.reach.length]]
+        .filter(([, , n]) => n).map(([k, label, n]) => `<button class="pill" data-jump="${k}">${label} <b>${n}</b></button>`).join('')}</div>
     </section>
     ${unmatched}${remind}${close}${reach}${nothing}${slotsCard}${upcoming}`;
 
   wireLogging(main());
+  for (const b of main().querySelectorAll('[data-jump]')) b.onclick = () => document.getElementById(`sec-${b.dataset.jump}`)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   for (const b of main().querySelectorAll('[data-status]')) {
     b.onclick = () => attempt(async () => {
       const id = b.dataset.id;
@@ -227,6 +230,8 @@ function renderToday() {
 }
 
 // ------------------------------------------------------------------ families
+
+const CAUGHT_UP = `<svg class="art" viewBox="0 0 160 110" aria-hidden="true"><circle cx="80" cy="55" r="44" fill="var(--lemon)"/><path d="M58 57l15 15 30-34" fill="none" stroke="var(--brand)" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/><circle cx="24" cy="24" r="6" fill="var(--brand)"/><circle cx="140" cy="86" r="8" fill="var(--brand)" opacity=".35"/><rect x="128" y="14" width="14" height="14" rx="4" fill="var(--brand)" opacity=".6" transform="rotate(20 135 21)"/></svg>`;
 
 const STATUS_LABEL = { open: 'Not scheduled', scheduled: 'Scheduled', declared: 'Declared', skip: 'Not this year' };
 
