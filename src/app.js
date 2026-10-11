@@ -87,6 +87,26 @@ function renderSyncBar() {
 
 // ------------------------------------------------------------------ today
 
+// Small inline icons, drawn here so nothing loads from another site.
+const ICON = {
+  text: '<path d="M4 5h16v11H9l-5 4z"/>',
+  email: '<rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/>',
+  call: '<path d="M6 3h3l2 5-2.5 1.5a11 11 0 0 0 6 6L16 13l5 2v3a2 2 0 0 1-2 2A16 16 0 0 1 4 5a2 2 0 0 1 2-2"/>',
+  in_person: '<circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/>',
+};
+const icon = (ch) => `<svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true">${ICON[ch] || ''}</svg>`;
+
+// A steady color per family, from its name, for the initials circle.
+const HUES = [152, 200, 230, 265, 330, 20, 40, 95];
+function avatar(name) {
+  const clean = String(name || '?').replace(/,.*$/, '').trim();
+  let h = 0;
+  for (const c of clean) h = (h * 31 + c.charCodeAt(0)) >>> 0;
+  const parts = clean.split(/[\s-]+/).filter(Boolean);
+  const ini = ((parts[0]?.[0] || '?') + (parts[1]?.[0] || '')).toUpperCase();
+  return `<span class="avatar" style="--h:${HUES[h % HUES.length]}" aria-hidden="true">${esc(ini)}</span>`;
+}
+
 function stepButtons(f, purpose, primary) {
   const s = store.current().settings;
   const chans = purpose === 'reminder' ? ['text', 'email', 'call'] : [...new Set([...(s.steps || []), 'text', 'email', 'call'])];
@@ -95,8 +115,8 @@ function stepButtons(f, purpose, primary) {
     const href = linkFor(ch, purpose, f, s);
     const cls = `btn ${ch === primary ? 'primary' : 'ghost'}${href ? '' : ' no-contact'}`;
     const attrs = `data-log="${ch}" data-purpose="${purpose}" data-id="${esc(f.id)}"`;
-    if (!href) return `<button class="${cls}" ${attrs} title="No ${ch === 'email' ? 'email' : 'phone number'} on file. Tapping logs it as done.">${CHANNEL_LABEL[ch]}</button>`;
-    return `<a class="${cls}" href="${esc(href)}" ${attrs}>${CHANNEL_LABEL[ch]}</a>`;
+    if (!href) return `<button class="${cls}" ${attrs} title="No ${ch === 'email' ? 'email' : 'phone number'} on file. Tapping logs it as done." aria-label="${CHANNEL_LABEL[ch]} (log only)">${icon(ch)}<span>${CHANNEL_LABEL[ch]}</span></button>`;
+    return `<a class="${cls}" href="${esc(href)}" ${attrs}>${icon(ch)}<span>${CHANNEL_LABEL[ch]}</span></a>`;
   }).join('');
 }
 
@@ -116,7 +136,7 @@ function wireLogging(root) {
   }
 }
 
-const card = (title, body, extra = '') => `<section class="card"><h2>${title}</h2>${extra}${body}</section>`;
+const card = (title, body, extra = '') => `<section class="group"><h2>${title}</h2><div class="card">${extra}${body}</div></section>`;
 const count = (n, tone = '') => `<span class="count ${tone}">${n}</span>`;
 
 function renderToday() {
@@ -133,7 +153,7 @@ function renderToday() {
     return;
   }
 
-  const fam = (f, line, buttons) => `<li class="row"><div class="who"><a href="#family/${esc(f.id)}">${esc(f.name)}</a>
+  const fam = (f, line, buttons) => `<li class="row">${avatar(f.name)}<div class="who"><a href="#family/${esc(f.id)}">${esc(f.name)}</a>
     <span class="meta">${line}</span>${f.notes ? `<span class="note">${esc(f.notes)}</span>` : ''}</div><div class="acts">${buttons}</div></li>`;
 
   const slots = p.sunday;
@@ -169,7 +189,7 @@ function renderToday() {
       ${doc.settings.wardName ? `<p class="eyebrow">${esc(doc.settings.wardName)}</p>` : ''}
       <h1><span class="num">${done}</span> of ${counted} <span class="soft">families scheduled or declared</span></h1>
       <div class="bar" role="progressbar" aria-valuenow="${pct}" aria-valuemin="0" aria-valuemax="100"><span style="width:${pct}%"></span></div>
-      <dl class="stats"><div><dt>Declared</dt><dd>${c.declared}</dd></div><div><dt>Scheduled</dt><dd>${c.scheduled}</dd></div><div><dt>Still to go</dt><dd>${c.open}</dd></div></dl>
+      <dl class="stats"><div><dt>Declared</dt><dd>${c.declared}</dd></div><div><dt>Scheduled</dt><dd>${c.scheduled}</dd></div><div><dt>To go</dt><dd>${c.open}</dd></div><div><dt>Done</dt><dd>${pct}%</dd></div></dl>
     </section>
     ${unmatched}${remind}${close}${reach}${nothing}${slotsCard}${upcoming}`;
 
