@@ -1,6 +1,6 @@
 // Offline: the app's own files are cached so it opens without a connection.
 // Only these files — never anything from Google or Microsoft, and never data.
-const CACHE = 'td-v1';
+const CACHE = 'td-v2';
 const FILES = ['./', 'index.html', 'styles.css', 'privacy.html', 'manifest.webmanifest', 'icon.svg', 'icon-180.png', 'icon-512.png',
   ...['app', 'calendar', 'config', 'dates', 'doc', 'google', 'ics', 'importer', 'match', 'messages', 'microsoft', 'plan', 'store', 'sync', 'wizard'].map((m) => `src/${m}.js`)];
 

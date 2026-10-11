@@ -90,11 +90,13 @@ function renderSyncBar() {
 function stepButtons(f, purpose, primary) {
   const s = store.current().settings;
   const chans = purpose === 'reminder' ? ['text', 'email', 'call'] : [...new Set([...(s.steps || []), 'text', 'email', 'call'])];
-  return chans.map((ch) => {
+  const sorted = [primary, ...chans.filter((c) => c !== primary)];
+  return sorted.map((ch) => {
     const href = linkFor(ch, purpose, f, s);
-    const cls = ch === primary ? 'btn primary' : 'btn';
-    if (!href) return `<button class="${cls}" data-log="${ch}" data-purpose="${purpose}" data-id="${esc(f.id)}" title="No ${ch === 'email' ? 'email' : 'phone'} on file — logs it only">${CHANNEL_LABEL[ch]} <small>log</small></button>`;
-    return `<a class="${cls}" href="${esc(href)}" data-log="${ch}" data-purpose="${purpose}" data-id="${esc(f.id)}">${CHANNEL_LABEL[ch]}</a>`;
+    const cls = `btn ${ch === primary ? 'primary' : 'ghost'}${href ? '' : ' no-contact'}`;
+    const attrs = `data-log="${ch}" data-purpose="${purpose}" data-id="${esc(f.id)}"`;
+    if (!href) return `<button class="${cls}" ${attrs} title="No ${ch === 'email' ? 'email' : 'phone number'} on file. Tapping logs it as done.">${CHANNEL_LABEL[ch]}</button>`;
+    return `<a class="${cls}" href="${esc(href)}" ${attrs}>${CHANNEL_LABEL[ch]}</a>`;
   }).join('');
 }
 
@@ -115,6 +117,7 @@ function wireLogging(root) {
 }
 
 const card = (title, body, extra = '') => `<section class="card"><h2>${title}</h2>${extra}${body}</section>`;
+const count = (n, tone = '') => `<span class="count ${tone}">${n}</span>`;
 
 function renderToday() {
   const doc = store.current();
@@ -139,17 +142,17 @@ function renderToday() {
       ${slots.open.length ? '<button class="link" data-copy-slots>Copy these times</button>' : ''}`)
     : '';
 
-  const remind = p.remind.length ? card(`Remind <span class="count">${p.remind.length}</span>`, `<ul>${p.remind.map((f) =>
+  const remind = p.remind.length ? card(`Remind ${count(p.remind.length, 'blue')}`, `<ul>${p.remind.map((f) =>
     fam(f, `${f.apptIsToday ? 'Today' : 'Tomorrow'}${f.apptTime ? `, ${esc(f.apptTime)}` : ''}`, stepButtons(f, 'reminder', 'text'))).join('')}</ul>`) : '';
 
-  const close = p.followUp.length ? card(`Close out <span class="count">${p.followUp.length}</span>`, `<p class="hint">These appointments have passed. Did they come?</p><ul>${p.followUp.map((f) =>
+  const close = p.followUp.length ? card(`Close out ${count(p.followUp.length, 'yellow')}`, `<p class="hint">These appointments have passed. Did they come?</p><ul>${p.followUp.map((f) =>
     fam(f, `Was ${esc(f.apptPretty)}`, `<button class="btn primary" data-status="declared" data-id="${esc(f.id)}">Declared</button>
       <button class="btn" data-status="open" data-id="${esc(f.id)}">Didn't come</button>`)).join('')}</ul>`) : '';
 
-  const reach = p.reach.length ? card(`Reach out <span class="count">${p.reach.length}</span>`, `<ul>${p.reach.map((f) =>
-    fam(f, `${esc(f.lastLine)} · next: <b>${CHANNEL_LABEL[f.next.channel]}${f.next.again ? ' again' : ''}</b>`, stepButtons(f, 'invite', f.next.channel))).join('')}</ul>`) : '';
+  const reach = p.reach.length ? card(`Reach out ${count(p.reach.length, '')}`, `<ul>${p.reach.map((f) =>
+    fam(f, `${esc(f.lastLine)} · next: ${CHANNEL_LABEL[f.next.channel].toLowerCase()}${f.next.again ? ' again' : ''}`, stepButtons(f, 'invite', f.next.channel))).join('')}</ul>`) : '';
 
-  const unmatched = p.unmatched.length ? card(`Bookings to check <span class="count">${p.unmatched.length}</span>`,
+  const unmatched = p.unmatched.length ? card(`Bookings to check ${count(p.unmatched.length, 'red')}`,
     `<p class="hint">These bookings didn't match exactly one family, so nobody will be reminded about them.</p><ul>${p.unmatched.map((e) => `
     <li class="row"><div class="who"><b>${esc(e.summary)}</b><span class="meta">${esc(prettyAppt(e.start))}${e.reason ? ` — ${esc(e.reason)}` : ''}${e.booker ? ` — booked by ${esc(e.booker.name)}` : ''}</span></div>
     <div class="acts"><select data-link-event="${esc(e.id)}"><option value="">Link to family…</option>${p.all.filter((f) => f.status !== 'skip').sort((a, b) => a.name.localeCompare(b.name)).map((f) => `<option value="${esc(f.id)}">${esc(f.name)}</option>`).join('')}</select>
@@ -158,13 +161,15 @@ function renderToday() {
   const nothing = !p.remind.length && !p.followUp.length && !p.reach.length && !p.unmatched.length
     ? card('All caught up', `<p>Nobody to remind or reach out to today.${p.waiting.length ? ` Next follow-up: ${esc(p.waiting[0].name)}, ${esc(p.waiting[0].dueOn)}.` : ''}</p>`) : '';
 
-  const upcoming = p.upcoming.length ? card(`Coming up <span class="count">${p.upcoming.length}</span>`, `<ul class="plain">${p.upcoming.slice(0, 12).map((f) =>
-    `<li><a href="#family/${esc(f.id)}">${esc(f.name)}</a> <span class="meta">${esc(f.apptPretty)}${f.reminded ? ' · reminded' : ''}</span></li>`).join('')}</ul>`) : '';
+  const upcoming = p.upcoming.length ? card(`Coming up ${count(p.upcoming.length, 'green')}`, `<ul class="plain">${p.upcoming.slice(0, 12).map((f) =>
+    `<li class="line"><a href="#family/${esc(f.id)}">${esc(f.name)}</a><span class="meta">${esc(f.apptPretty)}${f.reminded ? ' · reminded' : ''}</span></li>`).join('')}</ul>`) : '';
 
   main().innerHTML = `
-    <section class="progress card">
-      <div class="bar"><span style="width:${pct}%"></span></div>
-      <p><b>${done}</b> of ${counted} families scheduled or declared · ${c.open} still to go${doc.settings.wardName ? ` · ${esc(doc.settings.wardName)}` : ''}</p>
+    <section class="progress">
+      ${doc.settings.wardName ? `<p class="eyebrow">${esc(doc.settings.wardName)}</p>` : ''}
+      <h1><span class="num">${done}</span> of ${counted} <span class="soft">families scheduled or declared</span></h1>
+      <div class="bar" role="progressbar" aria-valuenow="${pct}" aria-valuemin="0" aria-valuemax="100"><span style="width:${pct}%"></span></div>
+      <dl class="stats"><div><dt>Declared</dt><dd>${c.declared}</dd></div><div><dt>Scheduled</dt><dd>${c.scheduled}</dd></div><div><dt>Still to go</dt><dd>${c.open}</dd></div></dl>
     </section>
     ${unmatched}${remind}${close}${reach}${nothing}${slotsCard}${upcoming}`;
 
